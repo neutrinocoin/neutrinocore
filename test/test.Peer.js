@@ -17,29 +17,29 @@ describe('Peer', function() {
     should.exist(Peer);
   });
   it('should be able to create instance', function() {
-    var p = new Peer('localhost', 8333);
+    var p = new Peer('localhost', 8777);
     should.exist(p);
   });
   it('should be able to create instance', function() {
-    var p = new Peer('localhost:8333');
+    var p = new Peer('localhost:8777');
     should.exist(p);
   });
   it('should be able to create instance', function() {
-    var p = new Peer('localhost:8333');
+    var p = new Peer('localhost:8777');
     var p2 = new Peer(p);
     should.exist(p2);
   });
   it('should not be able to create instance', function() {
     should.throw(function() {
-      new Peer(8333);
+      new Peer(8777);
     });
   });
   it('should be able to create instance', function() {
-    var p = new Peer('localhost', 8333);
-    p.toString().should.equal('localhost:8333');
+    var p = new Peer('localhost', 8777);
+    p.toString().should.equal('localhost:8777');
   });
   it('check host as buffer', function() {
-    var p = new Peer('127.0.0.1', 8333);
+    var p = new Peer('127.0.0.1', 8777);
     p.getHostAsBuffer().toString('hex').should.equal('7f000001');
   });
 });

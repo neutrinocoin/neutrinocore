@@ -117,7 +117,7 @@ console.log('\t #isComplete:' + tx.isComplete() );
     user: 'user',
     pass: 'pass',
     host: '127.0.0.1',
-    port: '18332',
+    port: '18776',
   };
   var rpc = new RpcClient(config);
   rpc.sendRawTransaction(txHex, function(err, ret) {
