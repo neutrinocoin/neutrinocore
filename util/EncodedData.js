@@ -1,6 +1,4 @@
-var imports = require('soop').imports();
-var base58 = imports.base58 || require('../lib/Base58').base58Check;
-
+var base58 = require('../lib/Base58').base58Check;
 
 // Constructor.  Takes the following forms:
 //   new EncodedData(<base58_address_string>)
@@ -9,18 +7,24 @@ var base58 = imports.base58 || require('../lib/Base58').base58Check;
 //   new EncodedData(<version>, <20-byte-hash>)
 function EncodedData(data, encoding) {
   this.data = data;
-  if(!encoding && (typeof data == 'string')) {
-    this.__proto__ = this.encodings['base58'];
+  if (!encoding && (typeof data == 'string')) {
+    encoding = 'base58';
+    this.converters = this.encodings[encoding].converters;
+    this._encoding = this.encodings[encoding]._encoding;
   } else {
-    this.__proto__ = this.encodings[encoding || 'binary'];
+    if (typeof this.encodings[encoding] === 'undefined')
+      encoding = 'binary';
+    this.converters = this.encodings[encoding].converters;
+    this._encoding = this.encodings[encoding]._encoding;
   }
 };
 
 // get or set the encoding used (transforms data)
 EncodedData.prototype.encoding = function(encoding) {
-  if(encoding && (encoding != this._encoding)) {
+  if (encoding && (encoding != this._encoding)) {
     this.data = this.as(encoding);
-    this.__proto__ = this.encodings[encoding];
+    this.converters = this.encodings[encoding].converters;
+    this._encoding = this.encodings[encoding]._encoding;
   }
   return this._encoding;
 };
@@ -32,7 +36,7 @@ EncodedData.prototype.withEncoding = function(encoding) {
 
 // answer the data in the given encoding
 EncodedData.prototype.as = function(encoding) {
-  if(!encodings[encoding]) throw new Error('invalid encoding');
+  if (!encodings[encoding]) throw new Error('invalid encoding: '+encoding);
   return this.converters[encoding].call(this);
 };
 
@@ -46,7 +50,7 @@ EncodedData.prototype.isValid = function() {
   try {
     this.validate();
     return true;
-  } catch(e) {
+  } catch (e) {
     return false;
   }
 };
@@ -54,16 +58,6 @@ EncodedData.prototype.isValid = function() {
 // subclasses can override to do more stuff
 EncodedData.prototype.validate = function() {
   this._validate();
-};
-
-// Boolean protocol for testing if valid
-EncodedData.prototype.isValid = function() {
-  try {
-    this.validate();
-    return true;
-  } catch(e) {
-    return false;
-  }
 };
 
 // convert to a string (in base58 form)
@@ -129,10 +123,12 @@ var encodings = {
   },
 };
 
-var no_conversion = function() {return this.data;};
-for(var k in encodings) {
-  if(encodings.hasOwnProperty(k)){
-    if(!encodings[k].converters[k])
+var no_conversion = function() {
+  return this.data;
+};
+for (var k in encodings) {
+  if (encodings.hasOwnProperty(k)) {
+    if (!encodings[k].converters[k])
       encodings[k].converters[k] = no_conversion;
     encodings[k]._encoding = k;
   }
@@ -140,13 +136,12 @@ for(var k in encodings) {
 
 EncodedData.applyEncodingsTo = function(aClass) {
   var tmp = {};
-  for(var k in encodings) {
+  for (var k in encodings) {
     var enc = encodings[k];
-    var obj = {};
-    for(var j in enc) {
+    var obj = Object.create(aClass.prototype);
+    for (var j in enc) {
       obj[j] = enc[j];
     }
-    obj.__proto__ = aClass.prototype;
     tmp[k] = obj;
   }
   aClass.prototype.encodings = tmp;
@@ -154,5 +149,4 @@ EncodedData.applyEncodingsTo = function(aClass) {
 
 EncodedData.applyEncodingsTo(EncodedData);
 
-module.exports = require('soop')(EncodedData);
-
+module.exports = EncodedData;

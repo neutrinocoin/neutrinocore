@@ -1,6 +1,8 @@
 var Put = require('bufferput');
 var buffertools = require('buffertools');
-var hex = function(hex) {return new Buffer(hex, 'hex');};
+var hex = function(hex) {
+  return new Buffer(hex, 'hex');
+};
 
 exports.livenet = {
   name: 'livenet',
@@ -23,6 +25,8 @@ exports.livenet = {
   dnsSeeds: [],
   defaultClientPort: 8777
 };
+
+exports.mainnet = exports.livenet;
 
 exports.testnet = {
   name: 'testnet',

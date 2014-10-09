@@ -10,3 +10,5 @@ tags
 coverage
 .DS_Store
 docs
+browser/bitcore-dev.js
+browser/testdata.js
